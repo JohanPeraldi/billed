@@ -2,6 +2,8 @@
  * @jest-environment jsdom
  */
 
+/* eslint-disable */
+
 import { fireEvent, screen, waitFor } from '@testing-library/dom';
 import userEvent from '@testing-library/user-event';
 import DashboardFormUI from '../views/DashboardFormUI.js';
