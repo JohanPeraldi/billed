@@ -1,3 +1,5 @@
+/* eslint-disable */
+
 export const localStorageMock = (function () {
   let store = {};
   return {

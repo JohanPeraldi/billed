@@ -78,10 +78,17 @@ export default class {
   }
 
   handleClickIconEye = () => {
+    // A regular expression to check whether the bill url ends with "null",
+    // in which case there is no bill to display
+    const regex = /(null)$/;
     const billUrl = $('#icon-eye-d').attr('data-bill-url');
-    const imgWidth = Math.floor($('#modaleFileAdmin1').width() * 0.8);
-    $('#modaleFileAdmin1').find('.modal-body').html(`<div style='text-align: center;'><img width=${imgWidth} src=${billUrl} alt="Bill"/></div>`);
-    if (typeof $('#modaleFileAdmin1').modal === 'function') $('#modaleFileAdmin1').modal('show');
+    if (!regex.test(billUrl)) {
+      const imgWidth = Math.floor($('#modaleFileAdmin1').width() * 0.8);
+      $('#modaleFileAdmin1').find('.modal-body').html(`<div style='text-align: center;'><img width=${imgWidth} src=${billUrl} alt="Bill"/></div>`);
+      if (typeof $('#modaleFileAdmin1').modal === 'function') $('#modaleFileAdmin1').modal('show');
+    } else {
+      console.log('There is no bill to display!');
+    }
   };
 
   handleEditTicket(e, bill, bills) {

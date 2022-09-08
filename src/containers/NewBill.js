@@ -1,3 +1,5 @@
+/* eslint-disable */
+
 import { ROUTES_PATH } from '../constants/routes.js';
 import Logout from './Logout.js';
 
@@ -20,28 +22,49 @@ export default class NewBill {
 
   handleChangeFile = (e) => {
     e.preventDefault();
+    // A regular expression to match strings ending with either .jpeg, .jpg or .png
+    const regex = /(.\.)(jpeg|jpg|png)$/;
     const file = this.document.querySelector('input[data-testid="file"]').files[0];
     const filePath = e.target.value.split(/\\/g);
     const fileName = filePath[filePath.length - 1];
     const formData = new FormData();
     const { email } = JSON.parse(localStorage.getItem('user'));
-    formData.append('file', file);
-    formData.append('email', email);
+    console.group('Attachment');
+    console.log('file: ', file);
+    console.log('file path: ', filePath);
+    console.log('file name: ', fileName);
+    console.log(formData);
+    console.groupEnd();
+    if (!regex.test(fileName)) {
+      // vider le contenu de l'input
+      this.document.querySelector('input[data-testid="file"]').value = null;
+      console.log('Invalid file type! .jpeg, .jpg or .png only!');
+      console.group('Invalid file info');
+      console.log('file: ', file);
+      console.log(formData);
+      console.groupEnd();
+      // formData.append('file', null); // vérifier cette ligne
+    } else {
+      formData.append('file', file);
+      formData.append('email', email);
 
-    this.store
-      .bills()
-      .create({
-        data: formData,
-        headers: {
-          noContentType: true,
-        },
-      })
-      .then(({ fileUrl, key }) => {
-        console.log(fileUrl);
-        this.billId = key;
-        this.fileUrl = fileUrl;
-        this.fileName = fileName;
-      }).catch((error) => console.error(error));
+      this.store
+        .bills()
+        .create({
+          data: formData,
+          headers: {
+            noContentType: true,
+          },
+        })
+        .then(({ fileUrl, key }) => {
+          console.log(fileUrl);
+          this.billId = key;
+          if (fileUrl) {
+            this.fileUrl = fileUrl;
+            this.fileName = fileName;
+          }
+        }).catch((error) => console.error(error));
+    }
   };
 
   handleSubmit = (e) => {
@@ -65,7 +88,7 @@ export default class NewBill {
     this.onNavigate(ROUTES_PATH.Bills);
   };
 
-  // not need to cover this function by tests
+  // no need to test this function
   updateBill = (bill) => {
     if (this.store) {
       this.store

@@ -1,3 +1,5 @@
+/* eslint-disable */
+
 const mockedBills = {
   list() {
     return Promise.resolve([{
