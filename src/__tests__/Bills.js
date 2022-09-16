@@ -5,12 +5,14 @@
 /* eslint-disable */
 
 import { screen, waitFor } from '@testing-library/dom';
+import userEvent from '@testing-library/user-event';
 import BillsUI from '../views/BillsUI.js';
 import { bills } from '../fixtures/bills.js';
-import { ROUTES_PATH } from '../constants/routes.js';
+import { ROUTES, ROUTES_PATH } from '../constants/routes.js';
+import { default as BillsContainer } from '../containers/Bills.js';
 import { localStorageMock } from '../__mocks__/localStorage.js';
+import mockStore from '../__mocks__/store';
 import router from '../app/Router.js';
-import userEvent from '@testing-library/user-event';
 
 describe('Given I am connected as an employee', () => {
   describe('When I am on Bills Page', () => {
@@ -50,6 +52,23 @@ describe('Given I am connected as an employee', () => {
         const modalWindow = screen.getByText('Justificatif');
         expect(handleClickIconEye).toHaveBeenCalled();
         expect(modalWindow).toBeTruthy();
+      });
+    });
+    describe('When I click on the new bill button', () => {
+      test('Then I should be redirected to the new bill page', () => {
+        const onNavigate = (pathname) => {
+          document.body.innerHTML = ROUTES({ pathname });
+        };
+        new BillsContainer ({
+          document, onNavigate, mockStore, bills, localStorage: window.localStorage,
+        });
+        const buttonNewBill = screen.getByTestId('btn-new-bill');
+        const handleClickNewBill = jest.fn();
+        buttonNewBill.addEventListener('click', handleClickNewBill);
+        userEvent.click(buttonNewBill);
+        expect(handleClickNewBill).toHaveBeenCalled();
+        const form = screen.getByTestId('form-new-bill');
+        expect(form).toBeTruthy();
       });
     });
   });

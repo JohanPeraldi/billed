@@ -60,7 +60,6 @@ export default class {
             });
           const reverseChrono = (a, b) => ((a < b) ? 1 : -1);
           bills.sort(reverseChrono);
-          console.log(bills);
 
           return bills;
         });
