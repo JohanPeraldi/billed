@@ -92,8 +92,9 @@ export default class {
   };
 
   handleEditTicket(e, bill, bills) {
-    console.log(e);
-    console.log(this);
+    console.log('Event: ', e);
+    console.log('this: ', this);
+    console.log('this.counter: ', this.counter);
     if (this.counter === undefined || this.id !== bill.id) this.counter = 0;
     if (this.id === undefined || this.id !== bill.id) this.id = bill.id;
     if (this.counter % 2 === 0) {
@@ -103,6 +104,7 @@ export default class {
       $(`#open-bill${bill.id}`).css({ background: '#2A2B35' });
       $('.dashboard-right-container div').html(DashboardFormUI(bill));
       $('.vertical-navbar').css({ height: '150vh' });
+      this.counter++;
     } else {
       $(`#open-bill${bill.id}`).css({ background: '#0D5AE5' });
 
@@ -138,14 +140,26 @@ export default class {
   };
 
   handleShowTickets(e, bills, index) {
-    if (this.counter === undefined || this.index !== index) this.counter = 0;
-    if (this.index === undefined || this.index !== index) this.index = index;
+    console.group('From handleShowTickets');
+    console.log('e: ', e);
+    console.log('bills: ', bills);
+    console.log('index (arrow number): ', index);
+    console.log('this: ', this);
+    console.log('this.counter: ', this.counter);
+    console.log('this.index: ', this.index);
+    console.groupEnd();
+    if (this.counter === undefined || this.index !== index) this.counter = 0; // this.counter & this.index are undefined on first click on an arrow
+    if (this.index === undefined || this.index !== index) this.index = index; // this.index !== index when a different arrow is clicked
     if (this.counter % 2 === 0) {
+      // show tickets
+      console.log('Tickets are visible');
       $(`#arrow-icon${this.index}`).css({ transform: 'rotate(0deg)' });
       $(`#status-bills-container${this.index}`)
         .html(cards(filteredBills(bills, getStatus(this.index))));
       this.counter++;
     } else {
+      // hide tickets
+      console.log('Tickets are hidden');
       $(`#arrow-icon${this.index}`).css({ transform: 'rotate(90deg)' });
       $(`#status-bills-container${this.index}`)
         .html('');

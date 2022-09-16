@@ -27,17 +27,10 @@ export default class {
   };
 
   handleClickIconEye = (icon) => {
-    // A regular expression to check whether the bill url ends with "null",
-    // in which case there is no bill to display
-    const regex = /(null)$/;
     const billUrl = icon.getAttribute('data-bill-url');
-    if (!regex.test(billUrl)) {
-      const imgWidth = Math.floor($('#modaleFile').width() * 0.5);
-      $('#modaleFile').find('.modal-body').html(`<div style='text-align: center;' class="bill-proof-container"><img width=${imgWidth} src=${billUrl} alt="Bill" /></div>`);
-      $('#modaleFile').modal('show');
-    } else {
-      console.log('There is no bill to display!');
-    }
+    const imgWidth = Math.floor($('#modaleFile').width() * 0.5);
+    $('#modaleFile').find('.modal-body').html(`<div style='text-align: center;' class="bill-proof-container"><img width=${imgWidth} src=${billUrl} alt="Bill" /></div>`);
+    $('#modaleFile').modal('show');
   };
 
   getBills = () => {
@@ -65,7 +58,10 @@ export default class {
                 };
               }
             });
-          console.log('length', bills.length);
+          const reverseChrono = (a, b) => ((a < b) ? 1 : -1);
+          bills.sort(reverseChrono);
+          console.log(bills);
+
           return bills;
         });
     }

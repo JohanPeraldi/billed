@@ -2,6 +2,8 @@
  * @jest-environment jsdom
  */
 
+/* eslint-disable */
+
 import { fireEvent, screen } from '@testing-library/dom';
 import LoginUI from '../views/LoginUI';
 import Login from '../containers/Login.js';
