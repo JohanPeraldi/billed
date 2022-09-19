@@ -47,13 +47,20 @@ describe('Given I am connected as an employee', () => {
     describe('When I click on an eye icon', () => {
       test('Then a bill should be displayed in a modal window', () => {
         document.body.innerHTML = BillsUI({ data: bills });
+        const onNavigate = (pathname) => {
+          document.body.innerHTML = ROUTES({ pathname });
+        };
+        const billsContainer = new BillsContainer({
+          document, onNavigate, mockStore, bills, localStorage: window.localStorage,
+        });
+        $.fn.modal = jest.fn();
         const eyeIconsList = screen.getAllByTestId('icon-eye');
-        const handleClickIconEye = jest.fn();
+        const handleClickIconEye = jest.fn((e) => billsContainer.handleClickIconEye(e.target));
         eyeIconsList.forEach((icon) => icon.addEventListener('click', handleClickIconEye));
         userEvent.click(eyeIconsList[0]);
-        const modalWindow = screen.getByText('Justificatif');
+        const modalWindowTitle = screen.getByText('Justificatif');
         expect(handleClickIconEye).toHaveBeenCalled();
-        expect(modalWindow).toBeTruthy();
+        expect(modalWindowTitle).toBeTruthy();
       });
     });
     describe('When I click on the new bill button', () => {
@@ -64,12 +71,12 @@ describe('Given I am connected as an employee', () => {
         new BillsContainer ({
           document, onNavigate, mockStore, bills, localStorage: window.localStorage,
         });
-        const buttonNewBill = screen.getByTestId('btn-new-bill');
         const handleClickNewBill = jest.fn();
+        const buttonNewBill = screen.getByTestId('btn-new-bill');
         buttonNewBill.addEventListener('click', handleClickNewBill);
         userEvent.click(buttonNewBill);
-        expect(handleClickNewBill).toHaveBeenCalled();
         const form = screen.getByTestId('form-new-bill');
+        expect(handleClickNewBill).toHaveBeenCalled();
         expect(form).toBeTruthy();
       });
     });
