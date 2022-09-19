@@ -58,8 +58,7 @@ export default class {
                 };
               }
             });
-          const reverseChrono = (a, b) => ((a < b) ? 1 : -1);
-          bills.sort(reverseChrono);
+          bills.sort((a, b) => (a.date > b.date) ? 1 : -1);
 
           return bills;
         });
