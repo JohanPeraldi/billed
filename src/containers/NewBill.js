@@ -29,21 +29,9 @@ export default class NewBill {
     const fileName = filePath[filePath.length - 1];
     const formData = new FormData();
     const { email } = JSON.parse(localStorage.getItem('user'));
-    console.group('Attachment');
-    console.log('file: ', file);
-    console.log('file path: ', filePath);
-    console.log('file name: ', fileName);
-    console.log(formData);
-    console.groupEnd();
     if (!regex.test(fileName)) {
-      // vider le contenu de l'input
+      // Empty the input
       this.document.querySelector('input[data-testid="file"]').value = null;
-      console.log('Invalid file type! .jpeg, .jpg or .png only!');
-      console.group('Invalid file info');
-      console.log('file: ', file);
-      console.log(formData);
-      console.groupEnd();
-      // formData.append('file', null); // vérifier cette ligne
     } else {
       formData.append('file', file);
       formData.append('email', email);
