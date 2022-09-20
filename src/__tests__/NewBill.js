@@ -25,7 +25,7 @@ describe('Given I am connected as an employee', () => {
       router();
       window.onNavigate(ROUTES_PATH.NewBill);
     });
-    test('Then the email icon inside the vertical navbar should be highlighted', async () => {
+    test('Then the mail icon inside the vertical navbar should be highlighted', async () => {
       await waitFor(() => screen.getByTestId('icon-mail'));
       const mailIcon = screen.getByTestId('icon-mail');
       expect(mailIcon.className).toBe('active-icon');
@@ -40,9 +40,12 @@ describe('Given I am connected as an employee', () => {
         const fileInput = screen.getByTestId('file');
         const validFile = new File(['valid file'], 'valid-file.jpg', {type: 'image/jpg'});
         userEvent.upload(fileInput, validFile);
+        const formData = new FormData();
+        formData.append('file', validFile);
         expect(fileInput.files[0]).toStrictEqual(validFile);
         expect(fileInput.files.item(0)).toStrictEqual(validFile);
         expect(fileInput.files).toHaveLength(1);
+        expect(formData.values).toBeTruthy();
       });
     });
     describe('When I click on the "Choose file" button and select a file with the txt extension', () => {
@@ -52,6 +55,29 @@ describe('Given I am connected as an employee', () => {
         userEvent.upload(fileInput, invalidFile);
         expect(fileInput.files[0]).toBeFalsy;
         expect(fileInput.files.item(0)).toBeFalsy;
+      });
+    });
+    describe('When I fill in all required fields and click on submit button', () => {
+      test('Then the bill should be saved', () => {
+        // First required field (date)
+        const date = screen.getByTestId('datepicker');
+        date.value = '2022-09-20';
+        // Second required field (amount)
+        const amount = screen.getByTestId('amount');
+        amount.value = 100;
+        // Third required field (VAT percentage)
+        const vatPerc = screen.getByTestId('pct');
+        vatPerc.value = 20;
+        // Fourth required field (file)
+        const fileInput = screen.getByTestId('file');
+        const validPngFile = new File(['valid png file'], 'valid-file.png', {type: 'image/png'});
+        userEvent.upload(fileInput, validPngFile);
+        // const form = screen.getByTestId('form-new-bill');
+        const submitBtn = screen.getByText('Envoyer');
+        const handleSubmit = jest.fn();
+        submitBtn.addEventListener('click', handleSubmit);
+        userEvent.click(submitBtn);
+        expect(handleSubmit).toHaveBeenCalled();
       });
     });
   });
