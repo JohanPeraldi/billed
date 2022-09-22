@@ -53,6 +53,7 @@ describe('Given I am connected as an employee', () => {
         const validFile = new File(['valid file'], 'valid-file.jpg', {type: 'image/jpg'});
         userEvent.upload(fileInput, validFile);
         expect(fileInput.files[0]).toStrictEqual(validFile);
+        expect(fileInput.files[0].name).toBe('valid-file.jpg');
         expect(fileInput.files).toHaveLength(1);
         expect(newBill.fileTypeIsValid).toBeTruthy;
       });
@@ -74,6 +75,7 @@ describe('Given I am connected as an employee', () => {
         const invalidFile = new File(['invalid file'], 'invalid-file.txt', {type: 'text/plain'});
         userEvent.upload(fileInput, invalidFile);
         expect(fileInput.files[0]).toStrictEqual(invalidFile);
+        expect(fileInput.files[0].name).toBe('invalid-file.txt');
         expect(fileInput.files).toHaveLength(1);
         expect(newBill.fileTypeIsValid).toBeFalsy();
       });
