@@ -6,15 +6,18 @@
 
 import { screen, waitFor } from '@testing-library/dom';
 import userEvent from '@testing-library/user-event';
-import NewBillUI from '../views/NewBillUI.js';
 import NewBill from '../containers/NewBill.js';
-import { ROUTES_PATH } from '../constants/routes.js';
+import NewBillUI from '../views/NewBillUI.js';
+import { ROUTES, ROUTES_PATH } from '../constants/routes.js';
 import { localStorageMock } from '../__mocks__/localStorage.js';
-import router from '../app/Router.js';
+import mockStore from '../__mocks__/store.js';
+import router from '../app/Router';
+
+jest.mock('../app/store', () => mockStore);
 
 describe('Given I am connected as an employee', () => {
   describe('When I am on NewBill Page', () => {
-    beforeEach(() => {
+    test('Then the mail icon inside the vertical navbar should be highlighted', async () => {
       Object.defineProperty(window, 'localStorage', { value: localStorageMock });
       window.localStorage.setItem('user', JSON.stringify({
         type: 'Employee',
@@ -24,8 +27,6 @@ describe('Given I am connected as an employee', () => {
       document.body.append(root);
       router();
       window.onNavigate(ROUTES_PATH.NewBill);
-    });
-    test('Then the mail icon inside the vertical navbar should be highlighted', async () => {
       await waitFor(() => screen.getByTestId('icon-mail'));
       const mailIcon = screen.getByTestId('icon-mail');
       expect(mailIcon.className).toBe('active-icon');
@@ -37,24 +38,43 @@ describe('Given I am connected as an employee', () => {
     });
     describe('When I click on the "Choose file" button and select a file with the jpg extension', () => {
       test('Then the file should be added to the form', () => {
+        const html = NewBillUI();
+        document.body.innerHTML = html;
+        const onNavigate = (pathname) => {
+          document.body.innerHTML = ROUTES({ pathname });
+        };
+        Object.defineProperty(window, 'localStorage', { value: localStorageMock });
+        window.localStorage.setItem('user', JSON.stringify({
+          type: 'Employee',
+        }));
+        const NewBillClass = new NewBill({ document, onNavigate, store: mockStore, localStorage: window.localStorage });
         const fileInput = screen.getByTestId('file');
+        console.log(fileInput);
+        // Create file with valid extension
         const validFile = new File(['valid file'], 'valid-file.jpg', {type: 'image/jpg'});
         userEvent.upload(fileInput, validFile);
-        const formData = new FormData();
-        formData.append('file', validFile);
         expect(fileInput.files[0]).toStrictEqual(validFile);
-        expect(fileInput.files.item(0)).toStrictEqual(validFile);
         expect(fileInput.files).toHaveLength(1);
-        expect(formData.values).toBeTruthy();
+        expect(NewBillClass.fileTypeIsValid).toBeTruthy;
       });
     });
     describe('When I click on the "Choose file" button and select a file with the txt extension', () => {
       test('Then the file should not be added to the form', () => {
+        const html = NewBillUI();
+        document.body.innerHTML = html;
+        const onNavigate = (pathname) => {
+          document.body.innerHTML = ROUTES({ pathname });
+        };
+        Object.defineProperty(window, 'localStorage', { value: localStorageMock });
+        window.localStorage.setItem('user', JSON.stringify({
+          type: 'Employee',
+        }));
+        const NewBillClass = new NewBill({ document, onNavigate, store: mockStore, localStorage: window.localStorage });
         const fileInput = screen.getByTestId('file');
         const invalidFile = new File(['invalid file'], 'invalid-file.txt', {type: 'text/plain'});
         userEvent.upload(fileInput, invalidFile);
-        expect(fileInput.files[0]).toBeFalsy;
-        expect(fileInput.files.item(0)).toBeFalsy;
+        expect(fileInput.files[0]).toBeNull;
+        expect(NewBillClass.fileTypeIsValid).toBeFalsy;
       });
     });
     describe('When I fill in all required fields and click on submit button', () => {
@@ -72,7 +92,6 @@ describe('Given I am connected as an employee', () => {
         const fileInput = screen.getByTestId('file');
         const validPngFile = new File(['valid png file'], 'valid-file.png', {type: 'image/png'});
         userEvent.upload(fileInput, validPngFile);
-        // const form = screen.getByTestId('form-new-bill');
         const submitBtn = screen.getByText('Envoyer');
         const handleSubmit = jest.fn();
         submitBtn.addEventListener('click', handleSubmit);

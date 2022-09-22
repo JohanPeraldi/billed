@@ -17,6 +17,7 @@ export default class NewBill {
     this.fileUrl = null;
     this.fileName = null;
     this.billId = null;
+    this.fileTypeIsValid;
     new Logout({ document, localStorage, onNavigate });
   }
 
@@ -32,9 +33,11 @@ export default class NewBill {
     if (!regex.test(fileName)) {
       // Empty the input
       this.document.querySelector('input[data-testid="file"]').value = null;
+      this.fileTypeIsValid = false;
     } else {
       formData.append('file', file);
       formData.append('email', email);
+      this.fileTypeIsValid = true;
 
       this.store
         .bills()
@@ -45,7 +48,6 @@ export default class NewBill {
           },
         })
         .then(({ fileUrl, key }) => {
-          console.log(fileUrl);
           this.billId = key;
           if (fileUrl) {
             this.fileUrl = fileUrl;
@@ -57,7 +59,7 @@ export default class NewBill {
 
   handleSubmit = (e) => {
     e.preventDefault();
-    console.log('e.target.querySelector(`input[data-testid="datepicker"]`).value', e.target.querySelector('input[data-testid="datepicker"]').value);
+    // console.log('e.target.querySelector(`input[data-testid="datepicker"]`).value', e.target.querySelector('input[data-testid="datepicker"]').value);
     const { email } = JSON.parse(localStorage.getItem('user'));
     const bill = {
       email,
