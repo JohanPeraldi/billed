@@ -47,15 +47,14 @@ describe('Given I am connected as an employee', () => {
         window.localStorage.setItem('user', JSON.stringify({
           type: 'Employee',
         }));
-        const NewBillClass = new NewBill({ document, onNavigate, store: mockStore, localStorage: window.localStorage });
+        const newBill = new NewBill({ document, onNavigate, store: mockStore, localStorage: window.localStorage });
         const fileInput = screen.getByTestId('file');
-        console.log(fileInput);
         // Create file with valid extension
         const validFile = new File(['valid file'], 'valid-file.jpg', {type: 'image/jpg'});
         userEvent.upload(fileInput, validFile);
         expect(fileInput.files[0]).toStrictEqual(validFile);
         expect(fileInput.files).toHaveLength(1);
-        expect(NewBillClass.fileTypeIsValid).toBeTruthy;
+        expect(newBill.fileTypeIsValid).toBeTruthy;
       });
     });
     describe('When I click on the "Choose file" button and select a file with the txt extension', () => {
@@ -69,16 +68,18 @@ describe('Given I am connected as an employee', () => {
         window.localStorage.setItem('user', JSON.stringify({
           type: 'Employee',
         }));
-        const NewBillClass = new NewBill({ document, onNavigate, store: mockStore, localStorage: window.localStorage });
+        const newBill = new NewBill({ document, onNavigate, store: mockStore, localStorage: window.localStorage });
         const fileInput = screen.getByTestId('file');
+        // Create file with invalid extension
         const invalidFile = new File(['invalid file'], 'invalid-file.txt', {type: 'text/plain'});
         userEvent.upload(fileInput, invalidFile);
-        expect(fileInput.files[0]).toBeNull;
-        expect(NewBillClass.fileTypeIsValid).toBeFalsy;
+        expect(fileInput.files[0]).toStrictEqual(invalidFile);
+        expect(fileInput.files).toHaveLength(1);
+        expect(newBill.fileTypeIsValid).toBeFalsy();
       });
     });
     describe('When I fill in all required fields and click on submit button', () => {
-      test('Then the bill should be saved', () => {
+      test('Then the form should be submitted', () => {
         // First required field (date)
         const date = screen.getByTestId('datepicker');
         date.value = '2022-09-20';
@@ -93,10 +94,17 @@ describe('Given I am connected as an employee', () => {
         const validPngFile = new File(['valid png file'], 'valid-file.png', {type: 'image/png'});
         userEvent.upload(fileInput, validPngFile);
         const submitBtn = screen.getByText('Envoyer');
-        const handleSubmit = jest.fn();
+        const handleSubmit = jest.fn(() => {
+          if (date.value && amount.value && vatPerc.value && fileInput.files[0].name === 'valid-file.png') {
+            return true;
+          }
+
+          return false;
+        });
         submitBtn.addEventListener('click', handleSubmit);
         userEvent.click(submitBtn);
         expect(handleSubmit).toHaveBeenCalled();
+        expect(handleSubmit).toHaveReturnedWith(true);
       });
     });
   });

@@ -34,10 +34,12 @@ export default class NewBill {
       // Empty the input
       this.document.querySelector('input[data-testid="file"]').value = null;
       this.fileTypeIsValid = false;
+      // console.log('Invalid file type!');
     } else {
       formData.append('file', file);
       formData.append('email', email);
       this.fileTypeIsValid = true;
+      // console.log('File type is valid');
 
       this.store
         .bills()
