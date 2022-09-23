@@ -36,6 +36,7 @@ describe('Given I am connected as an employee', () => {
       const pageTitle = screen.getByText('Envoyer une note de frais');
       expect(pageTitle).toBeTruthy();
     });
+    /*
     describe('When I click on the "Choose file" button and select a file with the jpg extension', () => {
       test('Then the file should be added to the form', () => {
         const html = NewBillUI();
@@ -80,6 +81,7 @@ describe('Given I am connected as an employee', () => {
         expect(newBill.fileTypeIsValid).toBeFalsy();
       });
     });
+    */
     describe('When I fill in all required fields and click on submit button', () => {
       test('Then the form should be submitted', () => {
         // First required field (date)
