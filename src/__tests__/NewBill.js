@@ -4,7 +4,7 @@
 
 /* eslint-disable */
 
-import { screen, waitFor } from '@testing-library/dom';
+import { fireEvent, screen, waitFor } from '@testing-library/dom';
 import userEvent from '@testing-library/user-event';
 import NewBill from '../containers/NewBill.js';
 import NewBillUI from '../views/NewBillUI.js';
@@ -31,57 +31,57 @@ describe('Given I am connected as an employee', () => {
       const mailIcon = screen.getByTestId('icon-mail');
       expect(mailIcon.className).toBe('active-icon');
     });
-    test('Then there should be a title "Envoyer une note de frais"', async () => {
-      await waitFor(() => screen.getByText('Envoyer une note de frais'));
-      const pageTitle = screen.getByText('Envoyer une note de frais');
-      expect(pageTitle).toBeTruthy();
+
+    describe('When I click on the submit button after filling all the form\'s required fields and attaching a valid file', () => {
+      test('Then the form should be submitted', async () => {
+        Object.defineProperty(window, 'localStorage', { value: localStorageMock });
+        window.localStorage.setItem('user', JSON.stringify({
+          type: 'Employee',
+        }));
+        const root = document.createElement('div');
+        root.setAttribute('id', 'root');
+        document.body.append(root);
+        router();
+        window.onNavigate(ROUTES_PATH.NewBill);
+        // Create new bill instance
+        const testBill = new NewBill({
+          document,
+          onNavigate,
+          store: mockStore,
+          localStorage: window.localStorage
+        });
+        // Create mock form submit function
+        const testFormSubmit = jest.fn((e) => testBill.handleSubmit(e));
+        // Add event listener to form
+        const form = screen.getByTestId('form-new-bill');
+        form.addEventListener('submit', testFormSubmit);
+        // Select Submit button
+        const submitBtn = screen.getByText(/^envoyer$/i);
+        expect(submitBtn.className).toContain('btn');
+        // Check that required fields are empty
+        const dateInput = screen.getByTestId('datepicker');
+        dateInput.value = '2022-01-01';
+        expect(dateInput.value).not.toBe('');
+        const amountInput = screen.getByTestId('amount');
+        amountInput.value = '500';
+        expect(+amountInput.value).toStrictEqual(500);
+        const vatPercentInput = screen.getByTestId('pct');
+        vatPercentInput.value = '20';
+        expect(+vatPercentInput.value).toStrictEqual(20);
+        // Create test file
+        const testFile = new File(['valid png file'], 'valid-file.png', {type: 'image/png'});
+        const fileInput = screen.getByTestId('file');
+        userEvent.upload(fileInput, testFile);
+        expect(fileInput.files).toHaveLength(1);
+        // Select form and try submitting it
+        expect(form).toHaveLength(9);
+        fireEvent.submit(form);
+        expect(testFormSubmit).toBeCalled();
+      });
+      /* test('Then I should stay on the new bill page') */
     });
+
     /*
-    describe('When I click on the "Choose file" button and select a file with the jpg extension', () => {
-      test('Then the file should be added to the form', () => {
-        const html = NewBillUI();
-        document.body.innerHTML = html;
-        const onNavigate = (pathname) => {
-          document.body.innerHTML = ROUTES({ pathname });
-        };
-        Object.defineProperty(window, 'localStorage', { value: localStorageMock });
-        window.localStorage.setItem('user', JSON.stringify({
-          type: 'Employee',
-        }));
-        const newBill = new NewBill({ document, onNavigate, store: mockStore, localStorage: window.localStorage });
-        const fileInput = screen.getByTestId('file');
-        // Create file with valid extension
-        const validFile = new File(['valid file'], 'valid-file.jpg', {type: 'image/jpg'});
-        userEvent.upload(fileInput, validFile);
-        expect(fileInput.files[0]).toStrictEqual(validFile);
-        expect(fileInput.files[0].name).toBe('valid-file.jpg');
-        expect(fileInput.files).toHaveLength(1);
-        expect(newBill.fileTypeIsValid).toBeTruthy;
-      });
-    });
-    describe('When I click on the "Choose file" button and select a file with the txt extension', () => {
-      test('Then the file should not be added to the form', () => {
-        const html = NewBillUI();
-        document.body.innerHTML = html;
-        const onNavigate = (pathname) => {
-          document.body.innerHTML = ROUTES({ pathname });
-        };
-        Object.defineProperty(window, 'localStorage', { value: localStorageMock });
-        window.localStorage.setItem('user', JSON.stringify({
-          type: 'Employee',
-        }));
-        const newBill = new NewBill({ document, onNavigate, store: mockStore, localStorage: window.localStorage });
-        const fileInput = screen.getByTestId('file');
-        // Create file with invalid extension
-        const invalidFile = new File(['invalid file'], 'invalid-file.txt', {type: 'text/plain'});
-        userEvent.upload(fileInput, invalidFile);
-        expect(fileInput.files[0]).toStrictEqual(invalidFile);
-        expect(fileInput.files[0].name).toBe('invalid-file.txt');
-        expect(fileInput.files).toHaveLength(1);
-        expect(newBill.fileTypeIsValid).toBeFalsy();
-      });
-    });
-    */
     describe('When I fill in all required fields and click on submit button', () => {
       test('Then the form should be submitted', () => {
         // First required field (date)
@@ -111,5 +111,6 @@ describe('Given I am connected as an employee', () => {
         expect(handleSubmit).toHaveReturnedWith(true);
       });
     });
+    */
   });
 });
