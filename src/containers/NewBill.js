@@ -23,23 +23,18 @@ export default class NewBill {
 
   handleChangeFile = (e) => {
     e.preventDefault();
-    // A regular expression to match strings ending with either .jpeg, .jpg or .png
-    const regex = /(.\.)(jpeg|jpg|png)$/;
-    const file = this.document.querySelector('input[data-testid="file"]').files[0];
+    const file = this.document.querySelector(`input[data-testid="file"]`).files[0];
     const filePath = e.target.value.split(/\\/g);
     const fileName = filePath[filePath.length - 1];
+    this.fileExtension = file.name.split(".")[1];
     const formData = new FormData();
-    const { email } = JSON.parse(localStorage.getItem('user'));
-    if (!regex.test(fileName)) {
-      // Empty the input
-      this.document.querySelector('input[data-testid="file"]').value = null;
-      this.fileTypeIsValid = false;
-      // console.log('Invalid file type!');
-    } else {
-      formData.append('file', file);
-      formData.append('email', email);
+    const email = JSON.parse(localStorage.getItem("user")).email;
+    formData.append("file", file);
+    formData.append("email", email);
+
+    const authorizedExtensions = ["jpg", "jpeg", "png"];
+    if (authorizedExtensions.includes(this.fileExtension)) {
       this.fileTypeIsValid = true;
-      // console.log('File type is valid');
 
       this.store
         .bills()
@@ -50,12 +45,15 @@ export default class NewBill {
           },
         })
         .then(({ fileUrl, key }) => {
+          console.log(fileUrl);
           this.billId = key;
-          if (fileUrl) {
-            this.fileUrl = fileUrl;
-            this.fileName = fileName;
-          }
-        }).catch((error) => console.error(error));
+          this.fileUrl = fileUrl;
+          this.fileName = fileName;
+        })
+        .catch((error) => console.error(error));
+    } else {
+      this.document.querySelector(`input[data-testid="file"]`).value = "";
+      this.fileTypeIsValid = false;
     }
   };
 

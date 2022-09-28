@@ -7,8 +7,7 @@
 import { fireEvent, screen, waitFor } from '@testing-library/dom';
 import userEvent from '@testing-library/user-event';
 import NewBill from '../containers/NewBill.js';
-import NewBillUI from '../views/NewBillUI.js';
-import { ROUTES, ROUTES_PATH } from '../constants/routes.js';
+import { ROUTES_PATH } from '../constants/routes.js';
 import { localStorageMock } from '../__mocks__/localStorage.js';
 import mockStore from '../__mocks__/store.js';
 import router from '../app/Router';
@@ -69,48 +68,18 @@ describe('Given I am connected as an employee', () => {
         vatPercentInput.value = '20';
         expect(+vatPercentInput.value).toStrictEqual(20);
         // Create test file
-        const testFile = new File(['valid png file'], 'valid-file.png', {type: 'image/png'});
+        const testFile = new File(['valid png file'], 'valid-file.png', {
+          type: 'image/png',
+        });
         const fileInput = screen.getByTestId('file');
         userEvent.upload(fileInput, testFile);
         expect(fileInput.files).toHaveLength(1);
+        expect(testBill.fileTypeIsValid).toBe(true);
         // Select form and try submitting it
         expect(form).toHaveLength(9);
         fireEvent.submit(form);
         expect(testFormSubmit).toBeCalled();
       });
-      /* test('Then I should stay on the new bill page') */
     });
-
-    /*
-    describe('When I fill in all required fields and click on submit button', () => {
-      test('Then the form should be submitted', () => {
-        // First required field (date)
-        const date = screen.getByTestId('datepicker');
-        date.value = '2022-09-20';
-        // Second required field (amount)
-        const amount = screen.getByTestId('amount');
-        amount.value = 100;
-        // Third required field (VAT percentage)
-        const vatPerc = screen.getByTestId('pct');
-        vatPerc.value = 20;
-        // Fourth required field (file)
-        const fileInput = screen.getByTestId('file');
-        const validPngFile = new File(['valid png file'], 'valid-file.png', {type: 'image/png'});
-        userEvent.upload(fileInput, validPngFile);
-        const submitBtn = screen.getByText('Envoyer');
-        const handleSubmit = jest.fn(() => {
-          if (date.value && amount.value && vatPerc.value && fileInput.files[0].name === 'valid-file.png') {
-            return true;
-          }
-
-          return false;
-        });
-        submitBtn.addEventListener('click', handleSubmit);
-        userEvent.click(submitBtn);
-        expect(handleSubmit).toHaveBeenCalled();
-        expect(handleSubmit).toHaveReturnedWith(true);
-      });
-    });
-    */
   });
 });
